@@ -1,4 +1,4 @@
-package com.example.studyspot.ui.theme
+package com.example.studyspot.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 

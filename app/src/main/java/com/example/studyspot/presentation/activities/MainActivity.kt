@@ -1,4 +1,4 @@
-package com.example.studyspot
+package com.example.studyspot.presentation.activities
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,13 +7,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.studyspot.ui.theme.StudySpotTheme
+import com.example.studyspot.domain.models.TimeSlot
+import com.example.studyspot.presentation.screens.seatmap.SeatMapRoute
+import com.example.studyspot.presentation.theme.StudySpotTheme
+import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
+import java.time.LocalTime
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,21 +30,18 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun StudySpotApp() {
+    // Temporary parameters until date and time selection is implemented.
+    val date = remember { LocalDate.now() }
+    val timeSlot = remember {
+        TimeSlot("morning", LocalTime.of(9, 0), LocalTime.of(12, 0))
+    }
     StudySpotTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Text(
-                text = stringResource(R.string.app_name),
+            SeatMapRoute(
+                date = date,
+                timeSlot = timeSlot,
                 modifier = Modifier.padding(innerPadding)
             )
         }
     }
-}
-
-@Preview(
-    showBackground = true,
-    showSystemUi = true
-)
-@Composable
-private fun StudySpotAppPreview() {
-    StudySpotApp()
 }

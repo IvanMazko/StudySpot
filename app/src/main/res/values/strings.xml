@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">StudySpot</string>
+    <string name="retry">Повторить</string>
+    <string name="no_seats">Мест нет</string>
+    <string name="seat_available">Свободно</string>
+    <string name="seat_occupied">Занято</string>
+    <string name="seat_status">Место %1$s: %2$s</string>
 </resources>
