@@ -9,17 +9,21 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import com.example.studyspot.R
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+@Composable
+private fun studySpotDarkColorScheme() = darkColorScheme(
+    primary = colorResource(R.color.theme_dark_primary),
+    secondary = colorResource(R.color.theme_dark_secondary),
+    tertiary = colorResource(R.color.theme_dark_tertiary),
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+@Composable
+private fun studySpotLightColorScheme() = lightColorScheme(
+    primary = colorResource(R.color.theme_light_primary),
+    secondary = colorResource(R.color.theme_light_secondary),
+    tertiary = colorResource(R.color.theme_light_tertiary),
 )
 
 @Composable
@@ -35,8 +39,8 @@ fun StudySpotTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> studySpotDarkColorScheme()
+        else -> studySpotLightColorScheme()
     }
 
     MaterialTheme(

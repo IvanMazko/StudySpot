@@ -1,37 +1,49 @@
-package com.example.studyspot.data.demo
+﻿package com.example.studyspot.data.demo
 
 import com.example.studyspot.domain.models.Seat
 import com.example.studyspot.domain.models.SeatPosition
 import com.example.studyspot.domain.models.SeatType
+import kotlin.random.Random
 
 object DemoHallData {
 
-    val seats: List<Seat> = listOf(
-        Seat(
-            id = "seat-1",
-            label = "1",
-            type = SeatType.REGULAR,
-            position = SeatPosition(row = 0, column = 0),
-        ),
-        Seat(
-            id = "seat-2",
-            label = "2",
-            type = SeatType.REGULAR,
-            position = SeatPosition(row = 0, column = 1),
-        ),
-        Seat(
-            id = "seat-3",
-            label = "3",
-            type = SeatType.COMPUTER,
-            position = SeatPosition(row = 1, column = 0),
-        ),
-        Seat(
-            id = "seat-4",
-            label = "4",
-            type = SeatType.COMPUTER,
-            position = SeatPosition(row = 1, column = 1),
-        ),
-    )
+    private const val ROW_COUNT = 8
+    private const val COLUMN_COUNT = 7
 
-    val occupiedSeatIds: Set<String> = setOf("seat-2")
+    val seats: List<Seat> = createSeats()
+
+    val occupiedSeatIds: Set<String> = setOf("seat-2", "seat-11", "seat-14", "seat-23", "seat-29", "seat-35", "seat-37","seat-39",
+        "seat-46", "seat-50", "seat-52", "seat-54")
+
+    private fun createSeats(): List<Seat> {
+        val result = mutableListOf<Seat>()
+        // Repeatable computer-seat distribution; coordinates are not random.
+        val random = Random(seed = 42)
+        var seatNumber = 1
+
+        for (row in 0 until ROW_COUNT) {
+            for (column in 0 until COLUMN_COUNT) {
+                val type = if (random.nextInt(4) == 0) {
+                    SeatType.COMPUTER
+                } else {
+                    SeatType.REGULAR
+                }
+
+                val seat = Seat(
+                    id = "seat-$seatNumber",
+                    label = seatNumber.toString(),
+                    type = type,
+                    position = SeatPosition(
+                        row = row,
+                        column = column,
+                    ),
+                )
+
+                result.add(seat)
+                seatNumber++
+            }
+        }
+
+        return result
+    }
 }

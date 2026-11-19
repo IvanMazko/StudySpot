@@ -2,6 +2,7 @@ package com.example.studyspot.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.studyspot.domain.models.AvailabilityStatus
 import com.example.studyspot.domain.models.TimeSlot
 import com.example.studyspot.domain.repository.SeatRepository
 import com.example.studyspot.presentation.state.SeatMapUiState
@@ -40,6 +41,31 @@ class SeatMapViewModel @Inject constructor(
                     errorMessage = "Не удалось загрузить места. Попробуйте ещё раз.",
                 )
             }
+        }
+    }
+
+    fun onSeatClick(seatId: String) {
+        val currentState = _state.value
+        if (currentState.isLoading || currentState.errorMessage != null) {
+            return
+        }
+
+        for (seatSlot in currentState.seatSlots) {
+            if (seatSlot.seat.id != seatId) {
+                continue
+            }
+            if (seatSlot.status != AvailabilityStatus.AVAILABLE) {
+                return
+            }
+
+            val selectedSeatId = if (currentState.selectedSeatId == seatId) {
+                null
+            } else {
+                seatId
+            }
+
+            _state.value = currentState.copy(selectedSeatId = selectedSeatId)
+            return
         }
     }
 }

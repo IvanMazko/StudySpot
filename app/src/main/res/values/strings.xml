@@ -1,4 +1,10 @@
 <resources>
+    <string name="hall_map">Карта зала</string>
+    <string name="map_hint">Выберите свободное место. Большую карту можно перемещать свайпом.</string>
+    <string name="seat_selected">Выбрано</string>
+    <string name="seat_computer">С компьютером</string>
+    <string name="seat_regular">Обычное</string>
+    <string name="seat_description">Место %1$s, %2$s, %3$s</string>
     <string name="app_name">StudySpot</string>
     <string name="retry">Повторить</string>
     <string name="no_seats">Мест нет</string>

@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="seat_selected_border">#FF16803C</color>
+    <color name="seat_border">#FF737373</color>
+    <color name="seat_available_background">@color/white</color>
+    <color name="seat_occupied_background">#FF9E9E9E</color>
+    <color name="seat_computer_icon">#FF303030</color>
+    <color name="theme_dark_primary">#FFD0BCFF</color>
+    <color name="theme_dark_secondary">#FFCCC2DC</color>
+    <color name="theme_dark_tertiary">#FFEFB8C8</color>
+    <color name="theme_light_primary">#FF6650A4</color>
+    <color name="theme_light_secondary">#FF625B71</color>
+    <color name="theme_light_tertiary">#FF7D5260</color>
+    <color name="transparent">#00000000</color>
+    <color name="launcher_background">#FF3DDC84</color>
+    <color name="launcher_grid">#33FFFFFF</color>
+    <color name="launcher_shadow">#44000000</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>

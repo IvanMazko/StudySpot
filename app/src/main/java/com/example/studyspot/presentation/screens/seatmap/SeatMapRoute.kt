@@ -25,6 +25,7 @@ fun SeatMapRoute(
 
     SeatMapScreen(
         state = state,
+        onSeatClick = viewModel::onSeatClick,
         onRetryClick = { viewModel.loadSeatSlots(date, timeSlot) },
         modifier = modifier,
     )

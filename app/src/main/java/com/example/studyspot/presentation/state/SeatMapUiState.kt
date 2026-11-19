@@ -6,4 +6,5 @@ data class SeatMapUiState(
     val seatSlots: List<SeatSlot> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val selectedSeatId: String? = null,
 )
