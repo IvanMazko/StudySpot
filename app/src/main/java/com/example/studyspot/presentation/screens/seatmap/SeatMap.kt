@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.example.studyspot.domain.models.SeatSlot
+import com.example.studyspot.domain.models.SeatType
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -33,6 +34,7 @@ fun SeatMap(
     selectedSeatId: String?,
     onSeatClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    requiresComputer: Boolean = false,
 ) {
     // Empty coordinates remain empty: places never reflow to fit the screen.
     var rowCount = 0
@@ -76,6 +78,7 @@ fun SeatMap(
                         SeatItem(
                             seatSlot = slot,
                             isSelected = slot.seat.id == selectedSeatId,
+                            isEligible = !requiresComputer || slot.seat.type == SeatType.COMPUTER,
                             onClick = { onSeatClick(slot.seat.id) },
                             modifier = Modifier.offset(
                                 x = 16.dp + cellWidth * slot.seat.position.column,

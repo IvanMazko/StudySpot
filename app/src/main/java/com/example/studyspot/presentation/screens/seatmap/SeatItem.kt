@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,36 +33,43 @@ fun SeatItem(
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isEligible: Boolean = true,
 ) {
     val isAvailable = seatSlot.status == AvailabilityStatus.AVAILABLE
     val status = stringResource(if (isAvailable) R.string.seat_available else R.string.seat_occupied)
     val type = stringResource(
         if (seatSlot.seat.type == SeatType.COMPUTER) R.string.seat_computer else R.string.seat_regular,
     )
-    val description = stringResource(R.string.seat_description, seatSlot.seat.label, type, status)
+    val eligibility = if (isEligible) status else stringResource(R.string.seat_not_matching_filter)
+    val description = stringResource(R.string.seat_description, seatSlot.seat.label, type, eligibility)
 
     Column(
         modifier = modifier
+            .alpha(if (isEligible) 1f else 0.4f)
             .semantics(mergeDescendants = true) { contentDescription = description }
             .selectable(
                 selected = isSelected,
-                enabled = isAvailable,
+                enabled = isAvailable && isEligible,
                 role = Role.Checkbox,
                 onClick = onClick,
             ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        SeatSymbol(isAvailable, isSelected, seatSlot.seat.type == SeatType.COMPUTER)
+        SeatSymbol(
+            isAvailable = isAvailable,
+            isSelected = isSelected,
+            hasComputer = seatSlot.seat.type == SeatType.COMPUTER,
+        )
         Text(text = seatSlot.seat.label, style = MaterialTheme.typography.labelLarge)
     }
 }
 
 @Composable
 internal fun SeatSymbol(
+    modifier: Modifier = Modifier,
     isAvailable: Boolean = true,
     isSelected: Boolean = false,
     hasComputer: Boolean = false,
-    modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(4.dp)
     val borderColor = colorResource(

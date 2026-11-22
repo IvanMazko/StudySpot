@@ -2,17 +2,21 @@ package com.example.studyspot.presentation.screens.seatmap
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,14 +38,69 @@ fun SeatMapScreen(
     state: SeatMapUiState,
     onSeatClick: (String) -> Unit,
     onRetryClick: () -> Unit,
+    onComputerRequiredChange: (Boolean) -> Unit,
+    onDateSelected: (LocalDate) -> Unit,
+    onTimeSlotSelected: (String) -> Unit,
+    onResetClick: () -> Unit,
+    onAvailabilityRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showDatePicker by rememberSaveable { mutableStateOf(false) }
+    val selectedDay = state.availableDays.firstOrNull { it.date == state.selectedDate }
+    val availableSlotIds = selectedDay?.availableTimeSlots?.map { it.id }?.toSet() ?: emptySet()
+    val availabilityReady = !state.isAvailabilityLoading && state.availabilityErrorMessage == null
+
+    if (showDatePicker && availabilityReady) {
+        SeatDatePickerDialog(
+            selectedDate = state.selectedDate,
+            availableDays = state.availableDays,
+            onDateSelected = onDateSelected,
+            onDismiss = { showDatePicker = false },
+        )
+    }
     Column(
         modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(text = stringResource(R.string.hall_map), style = androidx.compose.material3.MaterialTheme.typography.headlineSmall)
+        SeatSearchPanel(
+            requiresComputer = state.requiresComputer,
+            selectedDate = state.selectedDate,
+            timeSlots = state.timeSlots,
+            selectedTimeSlotId = state.selectedTimeSlot?.id,
+            availableTimeSlotIds = availableSlotIds,
+            onComputerRequiredChange = onComputerRequiredChange,
+            onDateClick = { showDatePicker = true },
+            onTimeSlotClick = onTimeSlotSelected,
+            enabled = availabilityReady && state.availableDays.isNotEmpty(),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        if (state.requiresComputer || state.selectedDate != null) {
+            TextButton(onClick = {
+                showDatePicker = false
+                onResetClick()
+            }) { Text(stringResource(R.string.reset_search)) }
+        }
         when {
+            state.isAvailabilityLoading -> CircularProgressIndicator()
+
+            state.availabilityErrorMessage != null -> {
+                Text(text = state.availabilityErrorMessage)
+                Button(onClick = onAvailabilityRetryClick) { Text(stringResource(R.string.retry)) }
+            }
+
+            state.availableDays.none { it.availableTimeSlots.isNotEmpty() } -> {
+                Text(text = stringResource(R.string.no_matching_dates))
+            }
+
+            state.selectedDate == null || state.selectedTimeSlot == null -> {
+                Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
+                    Text(stringResource(
+                        if (state.selectedDate == null) R.string.select_date_and_time_hint else R.string.select_time_hint,
+                    ))
+                }
+            }
+
             state.isLoading -> CircularProgressIndicator()
 
             state.errorMessage != null -> {
@@ -62,6 +121,7 @@ fun SeatMapScreen(
                 SeatMap(
                     seatSlots = state.seatSlots,
                     selectedSeatId = state.selectedSeatId,
+                    requiresComputer = state.requiresComputer,
                     onSeatClick = onSeatClick,
                     modifier = Modifier.fillMaxWidth().weight(1f),
                 )
@@ -76,7 +136,17 @@ fun SeatMapScreen(
 private fun SeatMapScreenPreview() {
     StudySpotTheme {
         var state by remember {
-            mutableStateOf(SeatMapUiState(seatSlots = previewSeatSlots(), selectedSeatId = "seat-1"))
+            val slots = previewSeatSlots()
+            val timeSlot = slots.first().timeSlot
+            val date = slots.first().date
+            mutableStateOf(SeatMapUiState(
+                seatSlots = slots,
+                selectedSeatId = "seat-1",
+                selectedDate = date,
+                selectedTimeSlot = timeSlot,
+                timeSlots = listOf(timeSlot),
+                availableDays = listOf(com.example.studyspot.domain.models.DayAvailability(date, listOf(timeSlot))),
+            ))
         }
         SeatMapScreen(
             state = state,
@@ -84,6 +154,11 @@ private fun SeatMapScreenPreview() {
                 state = state.copy(selectedSeatId = if (state.selectedSeatId == id) null else id)
             },
             onRetryClick = {},
+            onComputerRequiredChange = { state = state.copy(requiresComputer = it, selectedSeatId = null) },
+            onDateSelected = {},
+            onTimeSlotSelected = {},
+            onResetClick = {},
+            onAvailabilityRetryClick = {},
         )
     }
 }

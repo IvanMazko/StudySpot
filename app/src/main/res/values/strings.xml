@@ -1,4 +1,16 @@
 <resources>
+    <string name="reset_search">Сбросить выбор</string>
+    <string name="no_matching_dates">На ближайший месяц нет свободных мест по выбранным условиям.</string>
+    <string name="select_date_and_time_hint">Выберите дату и время, чтобы посмотреть свободные места.</string>
+    <string name="select_time_hint">Выберите доступный временной интервал.</string>
+    <string name="seat_not_matching_filter">Не подходит под выбранный фильтр</string>
+    <string name="only_computer_seats">Только места с компьютером</string>
+    <string name="choose_date">Выбрать дату</string>
+    <string name="selected_date">Дата: %1$s</string>
+    <string name="choose_time_slot">Временной интервал</string>
+    <string name="time_slot_range">%1$s-%2$s</string>
+    <string name="confirm_date">Выбрать</string>
+    <string name="cancel">Отмена</string>
     <string name="hall_map">Карта зала</string>
     <string name="map_hint">Выберите свободное место. Большую карту можно перемещать свайпом.</string>
     <string name="seat_selected">Выбрано</string>
@@ -10,5 +22,4 @@
     <string name="no_seats">Мест нет</string>
     <string name="seat_available">Свободно</string>
     <string name="seat_occupied">Занято</string>
-    <string name="seat_status">Место %1$s: %2$s</string>
 </resources>

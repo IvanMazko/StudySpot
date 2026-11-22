@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+import java.time.Clock
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -14,7 +15,10 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideSeatRepository(): SeatRepository {
-        return DemoSeatRepository()
-    }
+    fun provideClock(): Clock = Clock.systemDefaultZone()
+
+    @Provides
+    @Singleton
+    fun provideSeatRepository(): SeatRepository = DemoSeatRepository()
+
 }
