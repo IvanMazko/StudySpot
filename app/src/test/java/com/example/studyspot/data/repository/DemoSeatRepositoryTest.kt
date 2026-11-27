@@ -16,6 +16,21 @@ class DemoSeatRepositoryTest {
     private val evening = DemoHallData.timeSlots[2]
 
     @Test
+    fun emptyAndReversedDateRangesAreRejected() = runTest {
+        for (endDate in listOf(date, date.minusDays(1))) {
+            try {
+                repository.getAvailability(date, endDate, false)
+                org.junit.Assert.fail("Expected an invalid date range to be rejected")
+            } catch (exception: IllegalArgumentException) {
+                assertEquals(
+                    "Конец диапазона должен быть позже начала: $date — $endDate",
+                    exception.message,
+                )
+            }
+        }
+    }
+
+    @Test
     fun calendarAvailabilityRespectsFilterAndOccupiedIntervals() = runTest {
         val allSeats = repository.getAvailability(date, date.plusDays(5), false)
         val computers = repository.getAvailability(date, date.plusDays(5), true)

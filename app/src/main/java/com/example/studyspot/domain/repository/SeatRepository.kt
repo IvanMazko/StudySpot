@@ -8,7 +8,9 @@ import java.time.LocalDate
 interface SeatRepository {
     suspend fun getTimeSlots(): List<TimeSlot>
 
-    /** Includes startDate, excludes endDateExclusive. Empty intervals mean an unavailable day. */
+    /** Requires startDate < endDateExclusive; includes startDate, excludes endDateExclusive.
+     * Empty available time slots mean an unavailable day.
+     */
     suspend fun getAvailability(
         startDate: LocalDate,
         endDateExclusive: LocalDate,
