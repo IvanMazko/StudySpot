@@ -17,7 +17,9 @@ class DemoSeatRepository : SeatRepository {
         endDateExclusive: LocalDate,
         requiresComputer: Boolean,
     ): List<DayAvailability> {
-        require(!endDateExclusive.isBefore(startDate))
+        require(endDateExclusive.isAfter(startDate)) {
+            "Конец диапазона должен быть позже начала: $startDate — $endDateExclusive"
+        }
         val result = mutableListOf<DayAvailability>()
         var date = startDate
         while (date.isBefore(endDateExclusive)) {

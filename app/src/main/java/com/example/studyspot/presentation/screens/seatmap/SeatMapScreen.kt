@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.Alignment
@@ -82,7 +81,7 @@ fun SeatMapScreen(
             }) { Text(stringResource(R.string.reset_search)) }
         }
         when {
-            state.isAvailabilityLoading -> CircularProgressIndicator()
+            state.isAvailabilityLoading -> Unit
 
             state.availabilityErrorMessage != null -> {
                 Text(text = state.availabilityErrorMessage)
@@ -101,7 +100,7 @@ fun SeatMapScreen(
                 }
             }
 
-            state.isLoading -> CircularProgressIndicator()
+            state.isLoading -> Unit
 
             state.errorMessage != null -> {
                 Text(text = state.errorMessage)

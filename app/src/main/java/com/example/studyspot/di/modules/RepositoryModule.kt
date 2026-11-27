@@ -1,7 +1,8 @@
-package com.example.studyspot.di
+package com.example.studyspot.di.modules
 
 import com.example.studyspot.data.repository.DemoSeatRepository
 import com.example.studyspot.domain.repository.SeatRepository
+import com.example.studyspot.di.qualifiers.DemoRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,6 +20,6 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideSeatRepository(): SeatRepository = DemoSeatRepository()
-
+    @DemoRepository
+    fun provideDemoSeatRepository(): SeatRepository = DemoSeatRepository()
 }

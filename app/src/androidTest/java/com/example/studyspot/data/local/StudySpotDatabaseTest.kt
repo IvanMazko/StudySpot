@@ -11,6 +11,9 @@ import com.example.studyspot.data.local.entity.SeatEntity
 import com.example.studyspot.data.local.entity.TimeSlotEntity
 import com.example.studyspot.domain.models.SeatPosition
 import com.example.studyspot.domain.models.SeatType
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.UUID
@@ -32,7 +35,8 @@ class StudySpotDatabaseTest {
     private lateinit var context: Context
     private lateinit var database: StudySpotDatabase
     private var databaseFileName: String? = null
-    private val date = LocalDate.of(2026, 11, 24)
+    private val clock = Clock.fixed(Instant.parse("2026-11-24T06:00:00Z"), ZoneOffset.UTC)
+    private val date = LocalDate.now(clock).plusDays(10)
 
     @Before
     fun setUp() {
@@ -51,7 +55,7 @@ class StudySpotDatabaseTest {
         assertTrue(database.seatDao().getAll().isEmpty())
         assertTrue(database.timeSlotDao().getAll().isEmpty())
 
-        DatabaseSeeder(database).seed()
+        DatabaseSeeder(database, clock).seed()
 
         val seats = database.seatDao().getAll()
         assertEquals(56, seats.size)
@@ -76,12 +80,12 @@ class StudySpotDatabaseTest {
 
     @Test
     fun repeatedSeedingPreservesReferenceDataAndBookings() = runTest {
-        DatabaseSeeder(database).seed()
+        DatabaseSeeder(database, clock).seed()
         val seats = database.seatDao().getAll()
         val slots = database.timeSlotDao().getAll()
         val booking = insertBooking()
 
-        DatabaseSeeder(database).seed()
+        DatabaseSeeder(database, clock).seed()
 
         assertEquals(seats, database.seatDao().getAll())
         assertEquals(slots, database.timeSlotDao().getAll())
@@ -94,7 +98,7 @@ class StudySpotDatabaseTest {
         val seat = SeatEntity("custom", "Custom", SeatType.COMPUTER, SeatPosition(0, 0))
         database.seatDao().insertAll(listOf(seat))
 
-        DatabaseSeeder(database).seed()
+        DatabaseSeeder(database, clock).seed()
 
         assertEquals(listOf(seat), database.seatDao().getAll())
         assertEquals(3, database.timeSlotDao().getAll().size)
@@ -103,7 +107,7 @@ class StudySpotDatabaseTest {
     @Test
     fun concurrentSeedingDoesNotCreateDuplicates() = runTest {
         coroutineScope {
-            repeat(3) { launch { DatabaseSeeder(database).seed() } }
+            repeat(3) { launch { DatabaseSeeder(database, clock).seed() } }
         }
         assertEquals(56, database.seatDao().getAll().size)
         assertEquals(3, database.timeSlotDao().getAll().size)
@@ -111,7 +115,7 @@ class StudySpotDatabaseTest {
 
     @Test
     fun referenceDataCanBeFoundByIdAndMissingIdsReturnNull() = runTest {
-        DatabaseSeeder(database).seed()
+        DatabaseSeeder(database, clock).seed()
         val seat = database.seatDao().getAll().first()
         val slot = database.timeSlotDao().getAll().first()
 
@@ -124,7 +128,7 @@ class StudySpotDatabaseTest {
 
     @Test
     fun insertGeneratesDistinctIdsAndRoundTripsBookingData() = runTest {
-        DatabaseSeeder(database).seed()
+        DatabaseSeeder(database, clock).seed()
         val first = insertBooking()
         val second = insertBooking(booking(seatId = "seat-2"))
 
@@ -137,7 +141,7 @@ class StudySpotDatabaseTest {
 
     @Test
     fun duplicateSeatDateAndTimeSlotIsRejectedEvenForAnotherUser() = runTest {
-        DatabaseSeeder(database).seed()
+        DatabaseSeeder(database, clock).seed()
         val original = insertBooking()
 
         expectConstraint { database.bookingDao().insert(booking(userId = "another-user")) }
@@ -148,7 +152,7 @@ class StudySpotDatabaseTest {
 
     @Test
     fun changingAnyPartOfSlotAllowsAnotherBooking() = runTest {
-        DatabaseSeeder(database).seed()
+        DatabaseSeeder(database, clock).seed()
         insertBooking()
         insertBooking(booking(seatId = "seat-2"))
         insertBooking(booking(date = date.plusDays(1)))
@@ -159,7 +163,7 @@ class StudySpotDatabaseTest {
 
     @Test
     fun missingSeatOrTimeSlotIsRejected() = runTest {
-        DatabaseSeeder(database).seed()
+        DatabaseSeeder(database, clock).seed()
 
         expectConstraint { database.bookingDao().insert(booking(seatId = "missing")) }
         expectConstraint { database.bookingDao().insert(booking(timeSlotId = "missing")) }
@@ -169,7 +173,7 @@ class StudySpotDatabaseTest {
 
     @Test
     fun referencedSeatAndTimeSlotCannotBeDeleted() = runTest {
-        DatabaseSeeder(database).seed()
+        DatabaseSeeder(database, clock).seed()
         val saved = insertBooking()
 
         expectConstraint {
@@ -190,7 +194,7 @@ class StudySpotDatabaseTest {
 
     @Test
     fun queriesFilterByDateTimeSlotUserAndExclusiveRangeEnd() = runTest {
-        DatabaseSeeder(database).seed()
+        DatabaseSeeder(database, clock).seed()
         val before = insertBooking(booking(date = date.minusDays(1)))
         val morning = insertBooking()
         val afternoon = insertBooking(booking(timeSlotId = "afternoon", userId = "user-2"))
@@ -210,7 +214,7 @@ class StudySpotDatabaseTest {
 
     @Test
     fun deletingBookingReturnsCountAndFreesSlotForRebooking() = runTest {
-        DatabaseSeeder(database).seed()
+        DatabaseSeeder(database, clock).seed()
         val saved = insertBooking()
 
         assertEquals(1, database.bookingDao().deleteById(saved.id))
@@ -238,14 +242,14 @@ class StudySpotDatabaseTest {
         val fileName = "study-spot-test-${UUID.randomUUID()}.db"
         databaseFileName = fileName
         database = Room.databaseBuilder(context, StudySpotDatabase::class.java, fileName).build()
-        DatabaseSeeder(database).seed()
+        DatabaseSeeder(database, clock).seed()
         val seats = database.seatDao().getAll()
         val slots = database.timeSlotDao().getAll()
         val saved = insertBooking()
         database.close()
 
         database = Room.databaseBuilder(context, StudySpotDatabase::class.java, fileName).build()
-        DatabaseSeeder(database).seed()
+        DatabaseSeeder(database, clock).seed()
 
         assertEquals(seats, database.seatDao().getAll())
         assertEquals(slots, database.timeSlotDao().getAll())

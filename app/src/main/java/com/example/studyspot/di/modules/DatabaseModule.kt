@@ -1,4 +1,4 @@
-package com.example.studyspot.di
+package com.example.studyspot.di.modules
 
 import android.content.Context
 import androidx.room.Room

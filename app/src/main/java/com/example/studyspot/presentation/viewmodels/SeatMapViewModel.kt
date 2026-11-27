@@ -2,6 +2,7 @@ package com.example.studyspot.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.studyspot.di.qualifiers.OfflineRepository
 // import com.example.studyspot.domain.models.AvailabilityStatus
 import com.example.studyspot.domain.models.DayAvailability
 // import com.example.studyspot.domain.models.SeatType
@@ -24,7 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SeatMapViewModel @Inject constructor(
-    private val repository: SeatRepository,
+    @param:OfflineRepository private val repository: SeatRepository,
     private val clock: Clock,
 ) : ViewModel() {
     private val _state = MutableStateFlow(SeatMapUiState())
